@@ -1,0 +1,662 @@
+<!-- File: frontend/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Collaboration Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #eee;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            color: #00d9ff;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0,217,255,0.5);
+        }
+        
+        .subtitle {
+            color: #aaa;
+            font-size: 1.1em;
+        }
+        
+        .section {
+            background: rgba(22, 33, 62, 0.8);
+            padding: 30px;
+            margin-bottom: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,217,255,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .section:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0,217,255,0.3);
+        }
+        
+        h2 {
+            color: #00d9ff;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(15, 22, 36, 0.8);
+            border: 2px solid #2d3561;
+            border-radius: 8px;
+            color: #eee;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #00d9ff;
+            box-shadow: 0 0 10px rgba(0,217,255,0.3);
+        }
+        
+        textarea {
+            min-height: 120px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #00d9ff 0%, #00b8d4 100%);
+            color: #1a1a2e;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            box-shadow: 0 4px 12px rgba(0,217,255,0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,217,255,0.5);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results {
+            background: rgba(15, 22, 36, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #2d3561;
+        }
+        
+        .results::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .results::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+        
+        .results::-webkit-scrollbar-thumb {
+            background: #00d9ff;
+            border-radius: 4px;
+        }
+        
+        .match-item {
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(26, 35, 50, 0.8);
+            border-left: 4px solid #00d9ff;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .match-item:hover {
+            background: rgba(26, 35, 50, 1);
+            transform: translateX(5px);
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status.pending { 
+            background: #f39c12; 
+            color: #1a1a2e; 
+            animation: pulse 2s infinite;
+        }
+        .status.training { 
+            background: #3498db; 
+            color: #fff;
+            animation: pulse 2s infinite;
+        }
+        .status.completed { 
+            background: #2ecc71; 
+            color: #fff; 
+        }
+        .status.failed { 
+            background: #e74c3c; 
+            color: #fff; 
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            background: rgba(0,217,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(0,217,255,0.2);
+        }
+        
+        .stat-label {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            color: #00d9ff;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,217,255,0.3);
+            border-radius: 50%;
+            border-top-color: #00d9ff;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .alert.success {
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid #2ecc71;
+            color: #2ecc71;
+        }
+        
+        .alert.error {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+        }
+        
+        @media (max-width: 968px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛡️ SOC Collaboration Platform</h1>
+            <p class="subtitle">Privacy-Preserving Threat Intelligence Sharing</p>
+        </header>
+        
+        <div id="alert-container"></div>
+        
+        <div class="grid">
+            <!-- PSI Query Section -->
+            <div class="section">
+                <h2>🔍 Threat Intelligence Query (PSI)</h2>
+                <p style="color: #888; margin-bottom: 20px; font-size: 0.9em;">
+                    Find common indicators without revealing your unique threats
+                </p>
+                
+                <div class="form-group">
+                    <label>Organization ID:</label>
+                    <input type="text" id="psi-org-id" value="org_alpha" placeholder="Enter your organization ID" />
+                </div>
+                
+                <div class="form-group">
+                    <label>Indicator Type:</label>
+                    <select id="indicator-type">
+                        <option value="ip">IP Address</option>
+                        <option value="domain">Domain Name</option>
+                        <option value="hash">File Hash</option>
+                        <option value="email">Email Address</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Indicators (one per line):</label>
+                    <textarea id="indicators" placeholder="192.168.1.1
+10.0.0.5
+malware_hash_abc123
+suspicious.domain.com"></textarea>
+                </div>
+                
+                <button onclick="queryPSI()" id="query-btn">
+                    <span id="query-btn-text">Query Intersection</span>
+                </button>
+                
+                <div id="psi-results" class="results" style="display:none;">
+                    <h3 style="color: #00d9ff; margin-bottom: 15px;">Results:</h3>
+                    <div id="psi-matches"></div>
+                </div>
+            </div>
+            
+            <!-- FL Training Section -->
+            <div class="section">
+                <h2>🤖 Federated Learning Training</h2>
+                <p style="color: #888; margin-bottom: 20px; font-size: 0.9em;">
+                    Train collaborative ML models without sharing raw data
+                </p>
+                
+                <div class="form-group">
+                    <label>Organization ID:</label>
+                    <input type="text" id="fl-org-id" value="org_alpha" placeholder="Enter your organization ID" />
+                </div>
+                
+                <div class="form-group">
+                    <label>Model Type:</label>
+                    <select id="model-type">
+                        <option value="malware">Malware Detection</option>
+                        <option value="phishing">Phishing Detection</option>
+                        <option value="anomaly">Network Anomaly Detection</option>
+                        <option value="intrusion">Intrusion Detection</option>
+                    </select>
+                </div>
+                
+                <button onclick="startTraining()" id="training-btn">
+                    <span id="training-btn-text">Start Training</span>
+                </button>
+                
+                <div id="training-status" style="margin-top: 20px; display:none;">
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-label">Status</div>
+                            <div class="stat-value" id="status-badge"></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Progress</div>
+                            <div class="stat-value" id="progress-text">0/5</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Accuracy</div>
+                            <div class="stat-value" id="accuracy-text">N/A</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Query History -->
+        <div class="section">
+            <h2>📊 Recent Query History</h2>
+            <div id="query-history" class="results">
+                <div class="empty-state">No queries yet. Start by querying threat intelligence above.</div>
+            </div>
+        </div>
+        
+        <!-- Statistics Dashboard -->
+        <div class="section">
+            <h2>📈 Platform Statistics</h2>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">Total Queries</div>
+                    <div class="stat-value" id="total-queries">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active Training Jobs</div>
+                    <div class="stat-value" id="active-training">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Matches Found</div>
+                    <div class="stat-value" id="total-matches">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Connected Organizations</div>
+                    <div class="stat-value" id="connected-orgs">2</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8001/api/v1';
+        let currentTrainingId = null;
+        let queryCount = 0;
+        let totalMatches = 0;
+        let activeTraining = 0;
+        
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.textContent = message;
+            alert.style.display = 'block';
+            container.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+                container.removeChild(alert);
+            }, 5000);
+        }
+        
+        async function queryPSI() {
+            const orgId = document.getElementById('psi-org-id').value.trim();
+            const indicatorType = document.getElementById('indicator-type').value;
+            const indicatorsText = document.getElementById('indicators').value;
+            const indicators = indicatorsText.split('\n').filter(i => i.trim());
+            
+            if (!orgId) {
+                showAlert('Please enter an organization ID', 'error');
+                return;
+            }
+            
+            if (indicators.length === 0) {
+                showAlert('Please enter at least one indicator', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('query-btn');
+            const btnText = document.getElementById('query-btn-text');
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="loading"></span> Querying...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/query/threat-intersection`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        organization_id: orgId,
+                        indicators: indicators,
+                        indicator_type: indicatorType
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                displayPSIResults(result);
+                addToHistory(result);
+                updateStats();
+                showAlert(`Query completed! Found ${result.match_count} matches.`, 'success');
+            } catch (error) {
+                console.error('Query error:', error);
+                showAlert('Query failed: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'Query Intersection';
+            }
+        }
+        
+        function displayPSIResults(result) {
+            const resultsDiv = document.getElementById('psi-results');
+            const matchesDiv = document.getElementById('psi-matches');
+            
+            resultsDiv.style.display = 'block';
+            
+            if (result.match_count === 0) {
+                matchesDiv.innerHTML = '<div class="empty-state">No matches found across organizations</div>';
+            } else {
+                matchesDiv.innerHTML = result.matches.map(match => 
+                    `<div class="match-item">
+                        <strong>🎯 ${match}</strong>
+                        <div style="color: #888; font-size: 0.9em; margin-top: 5px;">
+                            Common indicator detected
+                        </div>
+                    </div>`
+                ).join('');
+            }
+            
+            totalMatches += result.match_count;
+        }
+        
+        async function startTraining() {
+            const orgId = document.getElementById('fl-org-id').value.trim();
+            const modelType = document.getElementById('model-type').value;
+            
+            if (!orgId) {
+                showAlert('Please enter an organization ID', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('training-btn');
+            const btnText = document.getElementById('training-btn-text');
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="loading"></span> Starting...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/training/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        organization_id: orgId,
+                        model_type: modelType
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                currentTrainingId = result.training_id;
+                
+                document.getElementById('training-status').style.display = 'block';
+                updateTrainingStatus(result);
+                pollTrainingStatus();
+                activeTraining++;
+                updateStats();
+                showAlert('Training started successfully!', 'success');
+            } catch (error) {
+                console.error('Training error:', error);
+                showAlert('Training failed: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'Start Training';
+            }
+        }
+        
+        async function pollTrainingStatus() {
+            if (!currentTrainingId) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/training/status/${currentTrainingId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Status check failed');
+                }
+                
+                const status = await response.json();
+                updateTrainingStatus(status);
+                
+                if (status.status === 'training' || status.status === 'pending') {
+                    setTimeout(pollTrainingStatus, 2000);
+                } else if (status.status === 'completed') {
+                    activeTraining = Math.max(0, activeTraining - 1);
+                    updateStats();
+                    showAlert('Training completed successfully!', 'success');
+                } else if (status.status === 'failed') {
+                    activeTraining = Math.max(0, activeTraining - 1);
+                    updateStats();
+                    showAlert('Training failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Status poll error:', error);
+            }
+        }
+        
+        function updateTrainingStatus(status) {
+            const badge = document.getElementById('status-badge');
+            badge.textContent = status.status.toUpperCase();
+            badge.className = `status ${status.status}`;
+            
+            document.getElementById('progress-text').textContent = 
+                `${status.current_round}/${status.total_rounds}`;
+            
+            document.getElementById('accuracy-text').textContent = 
+                status.accuracy ? `${(status.accuracy * 100).toFixed(1)}%` : 'N/A';
+        }
+        
+        function addToHistory(result) {
+            const historyDiv = document.getElementById('query-history');
+            const timestamp = new Date(result.timestamp).toLocaleString();
+            
+            if (historyDiv.querySelector('.empty-state')) {
+                historyDiv.innerHTML = '';
+            }
+            
+            const entry = document.createElement('div');
+            entry.className = 'match-item';
+            entry.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>Query ID:</strong> ${result.query_id.substring(0, 8)}...<br>
+                        <strong>Time:</strong> ${timestamp}<br>
+                        <strong>Matches:</strong> <span style="color: #00d9ff;">${result.match_count}</span>
+                    </div>
+                    <div style="text-align: right; color: #888;">
+                        ${result.match_count > 0 ? '✅' : '❌'}
+                    </div>
+                </div>
+            `;
+            
+            historyDiv.insertBefore(entry, historyDiv.firstChild);
+            
+            // Keep only last 10 entries
+            while (historyDiv.children.length > 10) {
+                historyDiv.removeChild(historyDiv.lastChild);
+            }
+            
+            queryCount++;
+        }
+        
+        function updateStats() {
+            document.getElementById('total-queries').textContent = queryCount;
+            document.getElementById('active-training').textContent = activeTraining;
+            document.getElementById('total-matches').textContent = totalMatches;
+        }
+        
+        // Check API health on load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('http://localhost:8001/health');
+                if (response.ok) {
+                    showAlert('Connected to SOC Collaboration Platform', 'success');
+                }
+            } catch (error) {
+                showAlert('Warning: Unable to connect to API. Please ensure services are running.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>
