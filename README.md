@@ -34,17 +34,17 @@ A privacy-preserving platform for Security Operations Center (SOC) analysts to c
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     Web Dashboard                            │
-│            (React/HTML - User Interface)                     │
+│                     Web Dashboard                           │
+│            (React/HTML - User Interface)                    │
 └───────────────────────┬─────────────────────────────────────┘
                         │
                         ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    API Gateway                               │
-│         (FastAPI - Unified REST Interface)                   │
+│                    API Gateway                              │
+│         (FastAPI - Unified REST Interface)                  │
 └────────┬────────────────────────────────────┬───────────────┘
-         │                                     │
-         ▼                                     ▼
+         │                                    │
+         ▼                                    ▼
 ┌──────────────────┐                 ┌─────────────────────┐
 │   PSI Service    │                 │   FL Service        │
 │  (OpenMined PSI) │                 │  (Flower Framework) │
@@ -56,8 +56,8 @@ A privacy-preserving platform for Security Operations Center (SOC) analysts to c
          │                                     │
          ▼                                     ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              Infrastructure Services                         │
-│         (Redis, PostgreSQL, Docker Network)                  │
+│              Infrastructure Services                        │
+│         (Redis, PostgreSQL, Docker Network)                 │
 └─────────────────────────────────────────────────────────────┘
 ```
 
